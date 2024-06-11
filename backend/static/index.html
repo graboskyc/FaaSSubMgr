@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light" />
+        
+        <title>Static</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.green.min.css" />
+
+        <script>
+            function init() {
+                return {
+                    listOfStreams: [],
+                    editable: false,
+                    selectedStream: {},
+                    async loadList() {
+                        console.log('Loading List');
+                        this.listOfStreams= await (await fetch('/api/listAll')).json();
+                        console.log(this.listOfStreams);
+                        this.editable = false;
+                    },
+                    async editStream(stream) {
+                        console.log('Editing Stream');
+                        this.selectedStream = stream;
+                        this.editable = true;
+                    },
+                    async saveStream() {
+                        console.log('Saving Stream');
+                        await fetch('/api/save/'+this.selectedStream._id.$oid, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.selectedStream)
+                        });
+                        this.editable = false;
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body data-theme="light">
+        <div x-data="init()" data-theme="light" class="container">
+            <nav data-theme="dark">
+                <ul>
+                    <li><img height="32" src="/img/leaf.png" style="height: 32px !important;" /></li>
+                </ul>
+                <ul>
+                    <li><button x-on:click="loadList">Load</button></li>
+                </ul>
+            </nav>
+
+
+            <article class="container-fluid" data-theme="light">
+                <h1>Stream Management</h1>
+                <p>I think I'll call this Stitch Triggers...</p>
+            </article>
+            
+            <div class="grid">
+                <article x-show="!editable" x-transition>
+                    <header><h1>Heading</h1></header>
+                    
+                    <table>
+                        <template x-for="s in listOfStreams">
+                            <tr>
+                                <td x-text="s.name"></td>
+                                <td x-text="s.resumeToken"></td>
+                                <td x-text="s.db"></td>
+                                <td x-text="s.col"></td>
+                                <td><button x-on:click="editStream(s)">Edit</button></td>
+                            </tr>
+                        </template>
+                    </table>
+                </article>
+
+                <article x-show="editable" x-transition>
+                    <header><h1>Editing</h1></header>
+                    <p>Editing</p>
+                    <pre x-text="JSON.stringify(selectedStream, null, 2)"></pre>
+                    <button x-on:click="saveStream">Save</button>
+                </article>
+            </div>
+
+        </div>
+
+    </body>
+</html>
