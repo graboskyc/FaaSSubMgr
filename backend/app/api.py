@@ -6,14 +6,24 @@ from bson.json_util import dumps
 import json
 from bson.objectid import ObjectId
 import os
+from app.watcher import watchersInit
+from multiprocessing import Process
+from multiprocessing import set_start_method
+from datetime import datetime
+
+set_start_method('fork', force=True)
+sp = Process(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions"))
+sp.start()
+#threading.Thread(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions")).start()
 
 class SubscriptionItem(BaseModel):
     name: str
-    pipeline: str 
-    resumeToken: str
+    pipeline: str
     connString: str
     db: str
     col: str
+    enabled: bool
+    webhook: str
 
 app = FastAPI(title="spa-app")
 api_app = FastAPI(title="api-app")
@@ -36,4 +46,19 @@ async def listAll():
 
 @api_app.put("/save/{id}")
 async def save(id:str, si: SubscriptionItem):
-    col.update_one({"_id": ObjectId(id) }, {"$set": si.model_dump() })
+    datetime_now = datetime.utcnow()
+    # i'm bad at python frameworks
+    d = si.model_dump()
+    d["modified"] = datetime_now
+    col.update_one({"_id": ObjectId(id) }, {"$set": d })
+
+@api_app.get("/delete/{id}")
+async def delete(id:str):
+    col.delete_one({"_id": ObjectId(id) })
+
+@api_app.get("/new")
+async def new():
+    obj = {"name":"New Subscription", "pipeline":"[]", "connString":"", "db":"", "col":"", "enabled":False, "webhook":"", "modified":datetime.utcnow()}
+    id = col.insert_one(obj).inserted_id
+    obj["_id"] = id
+    return json.loads(dumps(obj))

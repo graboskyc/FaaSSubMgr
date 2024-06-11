@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="color-scheme" content="light" />
         
-        <title>Static</title>
+        <title>ChangeStream Management</title>
 
         <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.green.min.css" />
@@ -29,7 +29,11 @@
                     },
                     async saveStream() {
                         console.log('Saving Stream');
-                        await fetch('/api/save/'+this.selectedStream._id.$oid, {
+                        var _id = this.selectedStream._id.$oid;
+                        delete this.selectedStream._id;
+                        delete this.selectedStream.modified;
+                        delete this.selectedStream.resumeToken;
+                        await fetch('/api/save/'+this._id, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -37,50 +41,98 @@
                             body: JSON.stringify(this.selectedStream)
                         });
                         this.editable = false;
-                    }
+                        await this.loadList();
+                    },
+                    async newStream() {
+                        console.log('New Stream');
+                        editable = false;
+                        this.selectedStream = await (await fetch('/api/new')).json();
+                        this.editable = true;
+                    },
+                    async deleteStream() {
+                        console.log('Loading List');
+                        var _id = this.selectedStream._id.$oid;
+                        await (await fetch('/api/delete/'+_id)).json();
+                        console.log(this.listOfStreams);
+                        await this.loadList();
+                        this.editable = false;
+                    },
                 }
             }
         </script>
     </head>
     <body data-theme="light">
-        <div x-data="init()" data-theme="light" class="container">
+        <div x-data="init()" x-init="loadList" data-theme="light" class="container">
             <nav data-theme="dark">
                 <ul>
                     <li><img height="32" src="/img/leaf.png" style="height: 32px !important;" /></li>
                 </ul>
                 <ul>
-                    <li><button x-on:click="loadList">Load</button></li>
+                    <li><button x-on:click="newStream">New Stream</button></li>
+                    <li x-show="editable" x-transition><button x-on:click="loadList">View List</button></li>
                 </ul>
             </nav>
 
 
             <article class="container-fluid" data-theme="light">
-                <h1>Stream Management</h1>
+                <h1>ChangeStream Management</h1>
                 <p>I think I'll call this Stitch Triggers...</p>
             </article>
             
             <div class="grid">
                 <article x-show="!editable" x-transition>
-                    <header><h1>Heading</h1></header>
+                    <header><h1>Existing Subscriptions</h1></header>
                     
                     <table>
-                        <template x-for="s in listOfStreams">
+                        <thead>
                             <tr>
-                                <td x-text="s.name"></td>
-                                <td x-text="s.resumeToken"></td>
-                                <td x-text="s.db"></td>
-                                <td x-text="s.col"></td>
-                                <td><button x-on:click="editStream(s)">Edit</button></td>
+                                <th>Name</th>
+                                <th>Namespace</th>
+                                <th>Enabled</th>
+                                <th>Actions</th>
                             </tr>
-                        </template>
+                        </thead>
+                        <tbody>
+                            <template x-for="s in listOfStreams">
+                                <tr>
+                                    <td x-text="s.name"></td>
+                                    <td x-text="s.db+'.'+s.col"></td>
+                                    <td x-text="s.enabled"></td>
+                                    <td><button x-on:click="editStream(s)">Edit</button></td>
+                                </tr>
+                            </template>
+                        </tbody>
                     </table>
                 </article>
 
                 <article x-show="editable" x-transition>
-                    <header><h1>Editing</h1></header>
-                    <p>Editing</p>
-                    <pre x-text="JSON.stringify(selectedStream, null, 2)"></pre>
+                    <header><h1>Edit Subscription</h1></header>
+
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" placeholder="name" name="name" x-model="selectedStream.name">
+
+                    <label for="connstr">Connection String</label>
+                    <input type="text" class="form-control" placeholder="connstr" name="connstr" x-model="selectedStream.connString">
+
+                    <label for="db">Database Name</label>
+                    <input type="text" class="form-control" placeholder="db" name="db" x-model="selectedStream.db">
+
+                    <label for="col">Collection Name</label>
+                    <input type="text" class="form-control" placeholder="col" name="col" x-model="selectedStream.col">
+
+                    <label for="webhook">Webhook</label>
+                    <input type="text" class="form-control" placeholder="webhook" name="webhook" x-model="selectedStream.webhook">
+
+                    <label for="pipeline">Pipeline</label>
+                    <textarea x-model="selectedStream.pipeline"></textarea>
+
+                    <label for="enabled">Enabled</label>
+                    <input type="checkbox" class="form-control" name="enabled" x-model="selectedStream.enabled">
+
+                    <br /><br />
+                    
                     <button x-on:click="saveStream">Save</button>
+                    <button x-on:click="deleteStream" class="secondary">Delete</button>
                 </article>
             </div>
 
