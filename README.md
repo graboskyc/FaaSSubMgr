@@ -15,6 +15,7 @@ A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.
 >>> import base64
 >>> base64.b64encode(os.urandom(96))
 ```
+* DO NOT LOSE THE ABOVE as without it you will not be able to regain your data as it is encrypted
 * Both variables should be in double quotes within the `.env` file
 
 ### Via a venv
@@ -32,7 +33,7 @@ $ python -m venv venv
 ## Use
 First, create a "New Stream":
 * Name - any name you want
-* Connection String - the connection string of the cluster to monitor the ChangeStream of
+* Connection String - the connection string of the cluster to monitor the ChangeStream of. This is encrypted with pymongo and MongoDB's [Queryable Encryption](https://www.mongodb.com/docs/manual/core/queryable-encryption/)
 * Database Name - the database namespace to use in the cluster
 * Collection Name - the collection inside the database to watch
 * Pipeline - The ChangeStream change event filter pipeline
@@ -54,3 +55,9 @@ This may be more useful when using Budibase as a Budibase Webhook will provide a
 ![](/screenshots/ss03.png)
 
 ![](/screenshots/ss04.png)
+
+![](/screenshots/miniscaletest.gif)
+
+![](/screenshots/ss05.png)
+
+![](/screenshots/ss06.png)
