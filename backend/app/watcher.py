@@ -58,9 +58,9 @@ def runWatch(id, conStr, db, col, pipeline, rt, wh):
                 resume_token = stream.resume_token
                 #print("SUBSCRIBER CHANGE")
                 print(change)
-
                 response = requests.post(wh, json=json.loads(dumps(change)))
-
+                #print(response.text)
                 masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token}})
+                #print("resume token updated")
     except pymongo.errors.PyMongoError:
         print("Error in watcher")

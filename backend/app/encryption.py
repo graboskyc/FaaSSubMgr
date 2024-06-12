@@ -57,8 +57,6 @@ def initEncryption(connStr, dbName, colName):
             "local", key_alt_names=["mainencryptionkey"]
         )
 
-        print(data_key_id)
-
         # Cleanup resources.
         client.close()
         client_encryption.close()
