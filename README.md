@@ -5,11 +5,22 @@
 A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.mongodb.com/docs/manual/changeStreams/) integration with [Budibase](https://budibase.com/product/#automate) Automation webhook workflows, which essentially gives a trigger management system
 
 ## Set up
+### Variables for all methods
 * Deploy a backing MongoDB cluster
 * Make sure a user exists with permissions on the `faas.subscriptions` namespace
-* Put the connection string for that cluster in an ENV variable called `SPECUIMDBCONNSTR` (as seen in the `sample.env`)
-* Install any requirements in `requirements.txt`
-* Run the python app via `main.py`
+* Put the connection string for that cluster in the .env file in the variable called `SPECUIMDBCONNSTR` (as seen in the `sample.env` which can be copied and renamed to just `.env`)
+
+### Via a venv
+* Create a venv:
+```
+$ cd backend
+$ python -m venv venv
+```
+* Edit `venv/bin/activate` to put a new line at the end with contents `export SPECUIMDBCONNSTR=$1`
+* Run `./activate.sh` script
+
+### Via docker
+* Run `./build.sh`
 
 ## Use
 First, create a "New Stream":
