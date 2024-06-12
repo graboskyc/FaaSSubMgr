@@ -11,6 +11,7 @@ source backend/.env
 datehash=`date | md5sum | cut -d" " -f1`
 abbrvhash=${datehash: -8}
 echo "Using conn string ${SPECUIMDBCONNSTR}"
+echo "Using conn string ${MASTERENCKEYASBASE64}"
 
 echo 
 echo "Building container using tag ${abbrvhash}"
@@ -27,7 +28,7 @@ if [ $EXITCODE -eq 0 ]
     echo
     docker stop faassubmgr
     docker rm faassubmgr
-    docker run -t -i -d -p 8000:8000 --name faassubmgr -e "SPECUIMDBCONNSTR=${SPECUIMDBCONNSTR}" --restart unless-stopped graboskyc/faassubmgr:latest
+    docker run -t -i -d -p 8000:8000 --name faassubmgr -e "SPECUIMDBCONNSTR=${SPECUIMDBCONNSTR}" -e "MASTERENCKEYASBASE64=${MASTERENCKEYASBASE64}" --restart unless-stopped graboskyc/faassubmgr:${abbrvhash}
 
     echo
     echo "+================================"

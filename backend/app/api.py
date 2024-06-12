@@ -12,9 +12,14 @@ from multiprocessing import Process
 from multiprocessing import set_start_method
 from datetime import datetime
 import requests
+from app.encryption import initEncryption
+from app.encryption import manualEncrypt
+from app.encryption import manualDecrypt
+
+initEncryption(os.environ["SPECUIMDBCONNSTR"].strip(), "faas", "whathappens")
 
 set_start_method('fork', force=True)
-sp = Process(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions"))
+sp = Process(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"].strip(), "faas", "subscriptions"))
 sp.start()
 
 class SubscriptionItem(BaseModel):
@@ -32,7 +37,7 @@ api_app = FastAPI(title="api-app")
 app.mount("/api", api_app)
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
-client = pymongo.MongoClient(os.environ["SPECUIMDBCONNSTR"])
+client = pymongo.MongoClient(os.environ["SPECUIMDBCONNSTR"].strip())
 db = client["faas"]
 col = db["subscriptions"]
 
@@ -45,12 +50,20 @@ async def listAll():
     cursor = col.find({})
     return json.loads(dumps(cursor))
 
+@api_app.get("/find/{id}")
+async def save(id:str):
+    # i'm bad at python frameworks
+    d = col.find_one({"_id": ObjectId(id) })
+    d["connString"] = manualDecrypt(client, d["connString"])
+    return json.loads(dumps(d))
+
 @api_app.put("/save/{id}")
 async def save(id:str, si: SubscriptionItem):
     datetime_now = datetime.utcnow()
     # i'm bad at python frameworks
     d = si.model_dump()
     d["modified"] = datetime_now
+    d["connString"] = manualEncrypt(client, d["connString"])
     col.update_one({"_id": ObjectId(id) }, {"$set": d })
 
 @api_app.get("/delete/{id}")
@@ -59,9 +72,11 @@ async def delete(id:str):
 
 @api_app.get("/new")
 async def new():
-    obj = {"name":"New Subscription", "pipeline":"[]", "connString":"", "db":"", "col":"", "enabled":False, "webhook":"", "modified":datetime.utcnow()}
+    obj = {"name":"New Subscription", "pipeline":"[]", "connString":"mongodb+srv://...", "db":"", "col":"", "enabled":False, "webhook":"", "resumeToken":"", "modified":datetime.utcnow()}
+    obj["connString"] = manualEncrypt(client, obj["connString"])
     id = col.insert_one(obj).inserted_id
     obj["_id"] = id
+    obj["connString"] = manualDecrypt(client, obj["connString"])
     return json.loads(dumps(obj))
 
 @api_app.post("/webhooktest/{id}")

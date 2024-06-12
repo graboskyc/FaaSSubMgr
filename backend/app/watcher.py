@@ -5,21 +5,24 @@ import time
 import os
 import requests
 from bson.json_util import dumps
+from app.encryption import manualDecrypt
 
 mainProc = None
 allProcs = []
 masterHandle = None
+masterClient = None
 
 def watchersInit(connStr, db, col):
     global mainProc
     global masterHandle
     global allProcs
+    global masterClient
     
     allProcs = []
 
     print("INITIALIZING WATCHERS")
-    client = pymongo.MongoClient(connStr)
-    masterHandle = client[db][col]
+    masterClient = pymongo.MongoClient(connStr)
+    masterHandle = masterClient[db][col]
 
     cursor = masterHandle.find({"enabled": True})
 
@@ -43,15 +46,17 @@ def watchersInit(connStr, db, col):
 
 def runWatch(id, conStr, db, col, pipeline, rt, wh):
     global masterHandle
+    global masterClient
     try:
         print ("Starting changestream thread against " +db + "." + col)
         resume_token = None
-        client = pymongo.MongoClient(conStr)
+        
+        client = pymongo.MongoClient(manualDecrypt(masterClient, conStr))
         handle = client[db][col]
         with handle.watch(pipeline, full_document="updateLookup") as stream:
             for change in stream:
                 resume_token = stream.resume_token
-                print("SUBSCRIBER CHANGE")
+                #print("SUBSCRIBER CHANGE")
                 print(change)
 
                 response = requests.post(wh, json=json.loads(dumps(change)))

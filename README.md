@@ -7,8 +7,15 @@ A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.
 ## Set up
 ### Variables for all methods
 * Deploy a backing MongoDB cluster
-* Make sure a user exists with permissions on the `faas.subscriptions` namespace
+* Make sure a user exists with permissions on the `faas.subscriptions` and `faas.__keyvault` namespaces
 * Put the connection string for that cluster in the .env file in the variable called `SPECUIMDBCONNSTR` (as seen in the `sample.env` which can be copied and renamed to just `.env`)
+* Generate an encryption key with the command below and put in `MASTERENCKEYASBASE64` value in the `.env` file created in the last step. Only include the value from python within the single quotes (omit the starting and trailing single quote and the starting b)
+```
+>>> import os
+>>> import base64
+>>> base64.b64encode(os.urandom(96))
+```
+* Both variables should be in double quotes within the `.env` file
 
 ### Via a venv
 * Create a venv:
@@ -16,7 +23,7 @@ A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.
 $ cd backend
 $ python -m venv venv
 ```
-* Edit `venv/bin/activate` to put a new line at the end with contents `export SPECUIMDBCONNSTR=$1`
+* Edit `venv/bin/activate` to put a new line at the end with contents `export SPECUIMDBCONNSTR=$1 MASTERENCKEYASBASE64=$2`
 * Run `./activate.sh` script
 
 ### Via docker
