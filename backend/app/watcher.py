@@ -3,6 +3,8 @@ from multiprocessing import Process
 import json
 import time
 import os
+import requests
+from bson.json_util import dumps
 
 mainProc = None
 allProcs = []
@@ -22,7 +24,7 @@ def watchersInit(connStr, db, col):
     cursor = masterHandle.find({"enabled": True})
 
     for doc in cursor:
-        proc = Process(target=runWatch, args=(doc["_id"], doc["connString"], doc["db"], doc["col"], json.loads(doc["pipeline"].replace("'","\"")), doc["resumeToken"]))
+        proc = Process(target=runWatch, args=(doc["_id"], doc["connString"], doc["db"], doc["col"], json.loads(doc["pipeline"].replace("'","\"")), doc["resumeToken"], doc["webhook"]))
         proc.start()
         allProcs.append(proc)
 
@@ -39,17 +41,21 @@ def watchersInit(connStr, db, col):
     watchersInit(connStr, db, col)
         
 
-def runWatch(id, conStr, db, col, pipeline, rt):
+def runWatch(id, conStr, db, col, pipeline, rt, wh):
     global masterHandle
     try:
         print ("Starting changestream thread against " +db + "." + col)
         resume_token = None
         client = pymongo.MongoClient(conStr)
         handle = client[db][col]
-        with handle.watch(pipeline) as stream:
+        with handle.watch(pipeline, full_document="updateLookup") as stream:
             for change in stream:
                 resume_token = stream.resume_token
+                print("SUBSCRIBER CHANGE")
                 print(change)
+
+                response = requests.post(wh, json=json.loads(dumps(change)))
+
                 masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token}})
     except pymongo.errors.PyMongoError:
         print("Error in watcher")

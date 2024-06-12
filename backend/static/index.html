@@ -16,6 +16,7 @@
                     listOfStreams: [],
                     editable: false,
                     selectedStream: {},
+                    webhookResponse : "",
                     async loadList() {
                         console.log('Loading List');
                         this.listOfStreams= await (await fetch('/api/listAll')).json();
@@ -26,6 +27,7 @@
                         console.log('Editing Stream');
                         this.selectedStream = stream;
                         this.editable = true;
+                        this.webhookResponse = "";
                     },
                     async saveStream() {
                         console.log('Saving Stream');
@@ -33,7 +35,7 @@
                         delete this.selectedStream._id;
                         delete this.selectedStream.modified;
                         delete this.selectedStream.resumeToken;
-                        await fetch('/api/save/'+this._id, {
+                        await fetch('/api/save/'+_id, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -56,6 +58,17 @@
                         console.log(this.listOfStreams);
                         await this.loadList();
                         this.editable = false;
+                    },
+                    async testWebhook() {
+                        console.log('Testing webhook');                        
+                        var _id = this.selectedStream._id.$oid;
+                        this.webhookResponse = await(await fetch('/api/webhooktest/'+_id, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.selectedStream)
+                        })).text();
                     },
                 }
             }
@@ -129,9 +142,12 @@
                     <label for="enabled">Enabled</label>
                     <input type="checkbox" class="form-control" name="enabled" x-model="selectedStream.enabled">
 
+                    <pre x-text="webhookResponse"></pre>
+
                     <br /><br />
                     
                     <button x-on:click="saveStream">Save</button>
+                    <button x-on:click="testWebhook">Test Webhook</button>
                     <button x-on:click="deleteStream" class="secondary">Delete</button>
                 </article>
             </div>

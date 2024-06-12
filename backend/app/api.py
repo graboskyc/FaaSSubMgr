@@ -3,13 +3,15 @@ from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 import pymongo
 from bson.json_util import dumps
-import json
+from bson.timestamp import Timestamp
 from bson.objectid import ObjectId
+import json
 import os
 from app.watcher import watchersInit
 from multiprocessing import Process
 from multiprocessing import set_start_method
 from datetime import datetime
+import requests
 
 set_start_method('fork', force=True)
 sp = Process(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions"))
@@ -62,3 +64,26 @@ async def new():
     id = col.insert_one(obj).inserted_id
     obj["_id"] = id
     return json.loads(dumps(obj))
+
+@api_app.post("/webhooktest/{id}")
+async def save(id:str, si: SubscriptionItem):
+    datetime_now = datetime.utcnow()
+    # i'm bad at python frameworks
+    d = si.model_dump()
+    localclient = pymongo.MongoClient(d["connString"])
+    localhandle = localclient[d["db"]][d["col"]]
+    sampleDoc = localhandle.find_one({})
+
+    retDoc = {
+        '_id': {'_data': 'RESUMETOKEN'}, 
+        'operationType': 'insert', 
+        'clusterTime': Timestamp(1718150638, 1), 
+        'wallTime': datetime(2024, 6, 12, 0, 3, 58, 343000), 
+        'ns': {'db': 'news-demo', 'coll': 'test'}, 
+        'documentKey': {'_id': ObjectId('6668e5deeb03e365f973122b')}
+    }
+
+    retDoc["fullDocument"] = sampleDoc
+
+    response = requests.post(d["webhook"], json=json.loads(dumps(retDoc)))
+    return response.text
