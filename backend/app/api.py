@@ -16,7 +16,6 @@ import requests
 set_start_method('fork', force=True)
 sp = Process(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions"))
 sp.start()
-#threading.Thread(target=watchersInit, args=(os.environ["SPECUIMDBCONNSTR"], "faas", "subscriptions")).start()
 
 class SubscriptionItem(BaseModel):
     name: str
