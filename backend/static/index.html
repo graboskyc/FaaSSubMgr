@@ -112,8 +112,20 @@
                         </small>
 
                         <label for="pipeline">Pipeline (<a href="https://www.mongodb.com/docs/manual/reference/change-events/" target="_blank">See Docs</a>)</label>
-                        <textarea x-model="selectedStream.pipeline" rows="5":aria-invalid="selectedStream.pipeline.length === 0 ? 'true':'false'">
-                        </textarea>
+                        <fieldset x-show="checkboxes">
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="insert" name="insert" />
+                            <label htmlFor="insert">insert</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="update" name="update" />
+                            <label htmlFor="update">update</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="replace" name="replace" />
+                            <label htmlFor="replace">replace</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="delete" name="delete" />
+                            <label htmlFor="delete">delete</label>
+                        </fieldset>
+                        <button x-show="checkboxes" x-on:click="generatePipeline">Generate Pipeline</button>
+
+                        <button x-show="!checkboxes" x-on:click="checkboxes=true">Build with GUI</button>
+                        <textarea x-show="!checkboxes" x-model="selectedStream.pipeline" rows="5":aria-invalid="selectedStream.pipeline.length === 0 ? 'true':'false'"></textarea>
                         <small x-show="selectedStream.pipeline.length === 0">
                             Please provide a valid Pipeline! A default pipeline would be <code>[]</code>
                         </small>

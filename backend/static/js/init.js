@@ -3,6 +3,8 @@ function init() {
         listOfStreams: [],
         editable: false,
         logs:false,
+        checkboxes:false,
+        selectedPipelineOptions: [],
         selectedStream: {"name":"", "connString":"mongodb+srv://...", "db":"", "col":"", "webhook":"", "pipeline":"[]", "enabled":false},
         webhookResponse : "",
         showPassword: false,
@@ -25,6 +27,24 @@ function init() {
             this.editable = false;
         },
 
+        async generatePipeline() {
+            console.log('Generating Pipeline');
+            console.log(this.selectedPipelineOptions);
+            if(this.selectedPipelineOptions.length == 1) {
+                this.selectedStream.pipeline = JSON.stringify([
+                    [{'$match': {'operationType': this.selectedPipelineOptions[0]}}]
+                ]);
+            } else if(this.selectedPipelineOptions.length > 0) {
+                this.selectedStream.pipeline = JSON.stringify([
+                    [{'$match': {'operationType': {'$in':this.selectedPipelineOptions }}}]
+                ]);
+            } else {
+                this.selectedStream.pipeline = "[]";
+            }
+            this.checkboxes = false;
+            this.selectedPipelineOptions = [];
+        },
+
         async editStream(stream) {
             console.log('Editing Stream');                        
             var _id = stream._id.$oid;
@@ -32,6 +52,7 @@ function init() {
             this.editable = true;
             this.logs = false;
             this.webhookResponse = "";
+            this.selectedPipelineOptions = [];
         },
 
         async saveStream() {
@@ -56,6 +77,7 @@ function init() {
                     body: JSON.stringify(this.selectedStream)
                 });
                 this.editable = false;
+                this.selectedPipelineOptions = [];
                 await this.loadList();
             } else {
                 alert("You must provide a valid connection string, database name, collection name, webhook, name, and pipeline!");
@@ -67,6 +89,7 @@ function init() {
             editable = false;
             this.selectedStream = await (await fetch('/api/new')).json();
             this.editable = true;
+            this.selectedPipelineOptions = [];
         },
 
         async deleteStream() {
