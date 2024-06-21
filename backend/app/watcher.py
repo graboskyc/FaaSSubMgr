@@ -6,6 +6,7 @@ import os
 import requests
 from bson.json_util import dumps
 from app.encryption import manualDecrypt
+from datetime import datetime
 
 mainProc = None
 allProcs = []
@@ -67,7 +68,7 @@ def runWatch(id, conStr, db, col, pipeline, rt, wh):
                     responseToInsert = response.text
                     
                 #print(response.text)
-                masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token, "webhookResponse": responseToInsert }})
+                masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token, "webhookResponse": responseToInsert, "lastRan": datetime.utcnow() }})
                 #print("resume token updated")
     except pymongo.errors.PyMongoError:
         print("Error in watcher")

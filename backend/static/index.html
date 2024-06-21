@@ -9,28 +9,45 @@
 
         <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.green.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
         <script>
             function init() {
                 return {
                     listOfStreams: [],
                     editable: false,
+                    logs:false,
                     selectedStream: {"name":"", "connString":"mongodb+srv://...", "db":"", "col":"", "webhook":"", "pipeline":"[]", "enabled":false},
                     webhookResponse : "",
                     showPassword: false,
+
                     async loadList() {
                         console.log('Loading List');
                         this.listOfStreams= await (await fetch('/api/listAll')).json();
                         console.log(this.listOfStreams);
                         this.editable = false;
+                        this.logs = false;
                     },
+
+                    async loadLogs(stream) {
+                        console.log('Loading Logs');
+                        var _id = stream._id.$oid;
+                        this.selectedStream = await (await fetch('/api/find/'+_id)).json();
+                        this.selectedStream.modifiedAsDateString = new Date(this.selectedStream.modified.$date).toISOString();
+                        this.selectedStream.lastRanAsDateString = new Date(this.selectedStream.lastRan.$date).toISOString();
+                        this.logs = true;
+                        this.editable = false;
+                    },
+
                     async editStream(stream) {
                         console.log('Editing Stream');                        
                         var _id = stream._id.$oid;
                         this.selectedStream = await (await fetch('/api/find/'+_id)).json();
                         this.editable = true;
+                        this.logs = false;
                         this.webhookResponse = "";
                     },
+
                     async saveStream() {
                         console.log('Saving Stream');
                         if(
@@ -58,12 +75,14 @@
                             alert("You must provide a valid connection string, database name, collection name, webhook, name, and pipeline!");
                         }
                     },
+
                     async newStream() {
                         console.log('New Stream');
                         editable = false;
                         this.selectedStream = await (await fetch('/api/new')).json();
                         this.editable = true;
                     },
+
                     async deleteStream() {
                         console.log('Loading List');
                         var _id = this.selectedStream._id.$oid;
@@ -72,6 +91,7 @@
                         await this.loadList();
                         this.editable = false;
                     },
+
                     async testWebhook() {
                         console.log('Testing webhook');                        
                         var _id = this.selectedStream._id.$oid;
@@ -83,12 +103,18 @@
                             body: JSON.stringify(this.selectedStream)
                         })).text();
                     },
+
                     async togglePassword() {
                         this.showPassword = !this.showPassword;
                     }
                 }
             }
         </script>
+        <style>
+            th,td {
+                text-align: center;
+            }
+        </style>
     </head>
     <body data-theme="light">
         <div x-data="init()" x-init="loadList" data-theme="light" class="container">
@@ -125,8 +151,15 @@
                                 <tr>
                                     <td x-text="s.name"></td>
                                     <td x-text="s.db+'.'+s.col"></td>
-                                    <td x-text="s.enabled"></td>
-                                    <td><button x-on:click="editStream(s)">Edit</button></td>
+                                    <td><input x-model="s.enabled" type="checkbox" role="switch" disabled /></td>
+                                    <td>
+                                        <button x-on:click="editStream(s)">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button x-on:click="loadLogs(s)" class="secondary">
+                                            <span class="material-symbols-outlined">article</span>
+                                        </button>
+                                    </td>
                                 </tr>
                             </template>
                         </tbody>
@@ -194,6 +227,32 @@
                         <button x-on:click="deleteStream" class="contrast">Delete</button>
                     </article>
                 </dialog>
+
+                <dialog x-show="logs" open x-transition.duration.500ms x-transition.opacity>
+                    <article>
+                        <header>
+                            <button aria-label="Close" rel="prev" x-on:click="loadList"></button>
+                            <h1>View Logs</h1>
+                        </header>
+
+                        <label>Last Modified</label>
+                        <code x-text="selectedStream.modifiedAsDateString"></code>
+
+                        <label>Last Execution</label>
+                        <code x-text="selectedStream.lastRanAsDateString"></code>
+
+                        <label>Last Webhook Response</label>
+                        <code x-text="JSON.stringify(selectedStream.webhookResponse)"></code>
+
+                        <label>Last Resume Token</label>
+                        <code x-text="JSON.stringify(selectedStream.resumeToken)"></code>
+
+                        <br /><br />
+                        
+                        <button x-on:click="loadList" class="secondary">Close</button>
+                    </article>
+                </dialog>
+
             </div>
 
         </div>
