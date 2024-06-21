@@ -2,7 +2,7 @@
 
 ## What is this
 
-A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.mongodb.com/docs/manual/changeStreams/) integration with [Budibase](https://budibase.com/product/#automate) Automation webhook workflows, which essentially gives a trigger management system
+A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.mongodb.com/docs/manual/changeStreams/) integration with [Budibase](https://budibase.com/product/#automate) Automation webhook workflows, which essentially gives a trigger management system. Although the examples use Budibase, it will work with any webhook that accepts an arbitrary HTTP POST.
 
 ## Technology Used
 * [FastAPI](https://fastapi.tiangolo.com/) - static webserver and APIs
