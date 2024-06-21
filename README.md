@@ -4,6 +4,13 @@
 
 A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.mongodb.com/docs/manual/changeStreams/) integration with [Budibase](https://budibase.com/product/#automate) Automation webhook workflows, which essentially gives a trigger management system
 
+## Technology Used
+* [FastAPI](https://fastapi.tiangolo.com/) - static webserver and APIs
+* [PicoCSS](https://picocss.com/) - Styling
+* [AlpineJS](https://alpinejs.dev/) - interactivity
+* [Material Icons](https://fonts.google.com/icons) - Icons
+* [MongoDB](https://www.mongodb.com/) - Database
+
 ## Set up
 ### Variables for all methods
 * Deploy a backing MongoDB cluster
