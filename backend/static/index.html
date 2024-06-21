@@ -120,7 +120,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody :aria-busy="listOfStreams.length === 0 ? 'true':'false'">
                             <template x-for="s in listOfStreams">
                                 <tr>
                                     <td x-text="s.name"></td>
