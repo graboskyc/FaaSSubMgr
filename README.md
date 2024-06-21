@@ -60,4 +60,6 @@ This may be more useful when using Budibase as a Budibase Webhook will provide a
 
 ![](/screenshots/ss05.png)
 
+![](/screenshots/ss07.png)
+
 ![](/screenshots/ss06.png)
