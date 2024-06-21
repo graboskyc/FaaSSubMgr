@@ -57,6 +57,10 @@ function init() {
 
         async saveStream() {
             console.log('Saving Stream');
+            if(this.checkboxes) {
+                await this.generatePipeline();
+            }
+
             if(
                 (this.selectedStream.connString != 'mongodb+srv://...') 
                 && (this.selectedStream.db.length > 0)
