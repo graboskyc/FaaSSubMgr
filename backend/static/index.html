@@ -113,14 +113,15 @@
 
                         <label for="pipeline">Pipeline (<a href="https://www.mongodb.com/docs/manual/reference/change-events/" target="_blank">See Docs</a>)</label>
                         <fieldset x-show="checkboxes">
-                            <input x-model="selectedPipelineOptions" type="checkbox" value="insert" name="insert" />
-                            <label htmlFor="insert">insert</label>
-                            <input x-model="selectedPipelineOptions" type="checkbox" value="update" name="update" />
-                            <label htmlFor="update">update</label>
-                            <input x-model="selectedPipelineOptions" type="checkbox" value="replace" name="replace" />
-                            <label htmlFor="replace">replace</label>
-                            <input x-model="selectedPipelineOptions" type="checkbox" value="delete" name="delete" />
-                            <label htmlFor="delete">delete</label>
+                            <legend>Watched operations:</legend>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="insert" name="insert" id="insert" />
+                            <label for="insert">insert</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="update" name="update" id="update" />
+                            <label for="update">update</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="replace" name="replace" id="replace" />
+                            <label for="replace">replace</label>
+                            <input x-model="selectedPipelineOptions" type="checkbox" value="delete" name="delete" id="delete" />
+                            <label for="delete">delete</label>
                         </fieldset>
                         <button x-show="checkboxes" x-on:click="generatePipeline">Generate Pipeline</button>
 
