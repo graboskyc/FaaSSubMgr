@@ -71,11 +71,13 @@ function init() {
 
         async deleteStream() {
             console.log('Loading List');
-            var _id = this.selectedStream._id.$oid;
-            await (await fetch('/api/delete/'+_id)).json();
-            console.log(this.listOfStreams);
-            await this.loadList();
-            this.editable = false;
+            if (confirm("Please confirm deleting '"+this.selectedStream.name+"'") == true) {
+                var _id = this.selectedStream._id.$oid;
+                await (await fetch('/api/delete/'+_id)).json();
+                console.log(this.listOfStreams);
+                await this.loadList();
+                this.editable = false;
+            }
         },
 
         async testWebhook() {
