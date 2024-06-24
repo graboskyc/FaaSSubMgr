@@ -28,7 +28,7 @@ def watchersInit(connStr, db, col):
     cursor = masterHandle.find({"enabled": True})
 
     for doc in cursor:
-        proc = Process(target=runWatch, args=(doc["_id"], doc["connString"], doc["db"], doc["col"], json.loads(doc["pipeline"].replace("'","\"")), doc["resumeToken"], doc["webhook"]))
+        proc = Process(target=runWatch, args=(doc["_id"], doc["connString"], doc["db"], doc["col"], json.loads(doc["pipeline"].replace("'","\"")), doc["resumeToken"], doc["webhook"], doc["secrets"]))
         proc.start()
         allProcs.append(proc)
 
@@ -45,7 +45,7 @@ def watchersInit(connStr, db, col):
     watchersInit(connStr, db, col)
         
 
-def runWatch(id, conStr, db, col, pipeline, rt, wh):
+def runWatch(id, conStr, db, col, pipeline, rt, wh, secrets=None):
     global masterHandle
     global masterClient
     try:
@@ -58,7 +58,8 @@ def runWatch(id, conStr, db, col, pipeline, rt, wh):
             for change in stream:
                 resume_token = stream.resume_token
                 #print("SUBSCRIBER CHANGE")
-                print(change)
+                #print(change)
+                change["secretsMetadata"] = secrets
                 response = requests.post(wh, json=json.loads(dumps(change)))
                 responseToInsert = ""
 

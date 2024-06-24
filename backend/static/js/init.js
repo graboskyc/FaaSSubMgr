@@ -7,6 +7,7 @@ function init() {
         selectedPipelineOptions: [],
         selectedStream: {"name":"", "connString":"mongodb+srv://...", "db":"", "col":"", "webhook":"", "pipeline":"[]", "enabled":false},
         webhookResponse : "",
+        newSecret: {"key":"", "value":""},
         showPassword: false,
 
         async loadList() {
@@ -25,6 +26,16 @@ function init() {
             this.selectedStream.lastRanAsDateString = new Date(this.selectedStream.lastRan.$date).toISOString();
             this.logs = true;
             this.editable = false;
+        },
+
+        async pushNewSecret() {
+            console.log('Pushing new secret');
+            if(this.newSecret.key.length > 0 && this.newSecret.value.length > 0) {
+                this.selectedStream.secrets.push(this.newSecret);
+                this.newSecret = {"key":"", "value":""};
+            } else {
+                alert("You must provide a key and value for the secret!");
+            }
         },
 
         async generatePipeline() {
@@ -73,6 +84,8 @@ function init() {
                 delete this.selectedStream._id;
                 delete this.selectedStream.modified;
                 delete this.selectedStream.resumeToken;
+                delete this.selectedStream.webhookResponse;
+                console.log(this.selectedStream);
                 await fetch('/api/save/'+_id, {
                     method: 'PUT',
                     headers: {

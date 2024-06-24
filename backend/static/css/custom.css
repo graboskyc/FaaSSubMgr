@@ -10,3 +10,7 @@ th,td {
 .btn-delete:hover {
     background-color: var(--pico-form-element-invalid-active-border-color);
 }
+
+label {
+    font-weight: bold;
+}

@@ -125,13 +125,48 @@
                         </fieldset>
                         <button x-show="checkboxes" x-on:click="generatePipeline">Generate Pipeline</button>
 
-                        <button x-show="!checkboxes" x-on:click="checkboxes=true">Build with GUI</button>
+                        <button x-show="!checkboxes" x-on:click="checkboxes=true">Build Pipeline via GUI</button>
                         <textarea x-show="!checkboxes" x-model="selectedStream.pipeline" rows="5":aria-invalid="selectedStream.pipeline.length === 0 ? 'true':'false'"></textarea>
                         <small x-show="selectedStream.pipeline.length === 0">
                             Please provide a valid Pipeline! A default pipeline would be <code>[]</code>
                         </small>
 
-                        <label for="enabled">Enabled</label>
+                        <label>Additional Metadata Context</label>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="s in selectedStream.secrets">
+                                    <tr>
+                                        <td x-text="s.key"></td>
+                                        <td x-text="s.value"></td>
+                                        <td>
+                                            <button class="btn-delete" x-on:click="selectedStream.secrets = selectedStream.secrets.filter((c) => c != s)">
+                                                <span class="material-symbols-outlined">delete</span>
+                                            </button>
+                                    </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td><input type="text" placeholder="key" x-model="newSecret.key" /></td>
+                                    <td><input type="text" placeholder="value" x-model="newSecret.value" /></td>
+                                    <td>
+                                        <button x-on:click="pushNewSecret">
+                                            <span class="material-symbols-outlined">add</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>                        
+
+                        <label for="enabled">Enable Trigger</label>
                         <input type="checkbox" name="enabled" x-model="selectedStream.enabled" role="switch">
 
                         <pre x-text="webhookResponse"></pre>

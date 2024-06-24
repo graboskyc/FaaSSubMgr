@@ -30,6 +30,7 @@ class SubscriptionItem(BaseModel):
     col: str
     enabled: bool
     webhook: str
+    secrets: list
 
 app = FastAPI(title="spa-app")
 api_app = FastAPI(title="api-app")
@@ -55,6 +56,13 @@ async def save(id:str):
     # i'm bad at python frameworks
     d = col.find_one({"_id": ObjectId(id) })
     d["connString"] = manualDecrypt(client, d["connString"])
+    decrArray = []
+    for secret in d["secrets"]:
+        decSecret = {}
+        decSecret["key"] = secret["key"]
+        decSecret["value"] = manualDecrypt(client, secret["value"])
+        decrArray.append(decSecret)
+    d["secrets"] = decrArray
     return json.loads(dumps(d))
 
 @api_app.put("/save/{id}")
@@ -64,6 +72,13 @@ async def save(id:str, si: SubscriptionItem):
     d = si.model_dump()
     d["modified"] = datetime_now
     d["connString"] = manualEncrypt(client, d["connString"])
+    encrArray = []
+    for secret in d["secrets"]:
+        encSecret = {}
+        encSecret["key"] = secret["key"]
+        encSecret["value"] = manualEncrypt(client, secret["value"])
+        encrArray.append(encSecret)
+    d["secrets"] = encrArray
     col.update_one({"_id": ObjectId(id) }, {"$set": d })
 
 @api_app.get("/delete/{id}")
@@ -72,7 +87,7 @@ async def delete(id:str):
 
 @api_app.get("/new")
 async def new():
-    obj = {"name":"New Subscription", "pipeline":"[]", "connString":"mongodb+srv://...", "db":"", "col":"", "enabled":False, "webhook":"", "resumeToken":"", "modified":datetime.utcnow()}
+    obj = {"name":"New Subscription", "pipeline":"[]", "connString":"mongodb+srv://...", "db":"", "col":"", "enabled":False, "webhook":"", "resumeToken":"", "modified":datetime.utcnow(), "secrets":[] }
     obj["connString"] = manualEncrypt(client, obj["connString"])
     id = col.insert_one(obj).inserted_id
     obj["_id"] = id
