@@ -111,9 +111,23 @@
                             Please provide a valid webhook!
                         </small>
 
-                        <label for="pipeline">Pipeline (<a href="https://www.mongodb.com/docs/manual/reference/change-events/" target="_blank">See Docs</a>)</label>
+                        <label for="pipeline">
+                            Pipeline 
+                            <div role="group">
+                                <a href="https://www.mongodb.com/docs/manual/reference/change-events/" target="_blank" x-show="!checkboxes" class="secondary" role="button"  style="font-size: x-small; height: 50%;">
+                                    See Pipeline Docs
+                                </a> 
+                                <button class="secondary" x-show="!checkboxes" x-on:click="checkboxes=true" style="font-size: x-small; height: 50%;">Build Pipeline via GUI</button>
+                                <button x-show="checkboxes" x-on:click="generatePipeline" class="secondary"  style="font-size: x-small; height: 50%;">Generate Pipeline Query</button>
+                            </div>
+                        </label>
+                        
+                        <textarea x-show="!checkboxes" x-model="selectedStream.pipeline" rows="5":aria-invalid="selectedStream.pipeline.length === 0 ? 'true':'false'"></textarea>
+                        <small x-show="selectedStream.pipeline.length === 0">
+                            Please provide a valid Pipeline! A default pipeline would be <code>[]</code>
+                        </small>
+                        
                         <fieldset x-show="checkboxes">
-                            <legend>Watched operations:</legend>
                             <input x-model="selectedPipelineOptions" type="checkbox" value="insert" name="insert" id="insert" />
                             <label for="insert">insert</label>
                             <input x-model="selectedPipelineOptions" type="checkbox" value="update" name="update" id="update" />
@@ -123,13 +137,6 @@
                             <input x-model="selectedPipelineOptions" type="checkbox" value="delete" name="delete" id="delete" />
                             <label for="delete">delete</label>
                         </fieldset>
-                        <button x-show="checkboxes" x-on:click="generatePipeline">Generate Pipeline</button>
-
-                        <button x-show="!checkboxes" x-on:click="checkboxes=true">Build Pipeline via GUI</button>
-                        <textarea x-show="!checkboxes" x-model="selectedStream.pipeline" rows="5":aria-invalid="selectedStream.pipeline.length === 0 ? 'true':'false'"></textarea>
-                        <small x-show="selectedStream.pipeline.length === 0">
-                            Please provide a valid Pipeline! A default pipeline would be <code>[]</code>
-                        </small>
 
                         <label>Additional Metadata Context</label>
                         <table>
@@ -144,7 +151,7 @@
                                 <template x-for="s in selectedStream.secrets">
                                     <tr>
                                         <td x-text="s.key"></td>
-                                        <td x-text="s.value"></td>
+                                        <td x-text="s.value.replace(/./g, '*')"></td>
                                         <td>
                                             <button class="btn-delete" x-on:click="selectedStream.secrets = selectedStream.secrets.filter((c) => c != s)">
                                                 <span class="material-symbols-outlined">delete</span>

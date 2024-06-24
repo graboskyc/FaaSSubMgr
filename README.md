@@ -45,6 +45,7 @@ First, create a "New Stream":
 * Collection Name - the collection inside the database to watch
 * Pipeline - The ChangeStream change event filter pipeline
 * Webhook - the URL to which to HTTP POST the full change event
+* Additional metadata context - any key/value you want to send in the payload. Will be in the `secretsMetadata` field. The value is stored encrypted in the database
 * Enabled - checkbox to enable/disable the watch
 
 Upon saving or any modification, the system will `watch` that collection using the `pipeline` provided and forward any `change_event` to the URL provided as a `POST`
@@ -58,6 +59,8 @@ This may be more useful when using Budibase as a Budibase Webhook will provide a
 ![](/screenshots/ss01.png)
 
 ![](/screenshots/ss02.png)
+
+![](/screenshots/ss02_alt.png)
 
 ![](/screenshots/ss03.png)
 
