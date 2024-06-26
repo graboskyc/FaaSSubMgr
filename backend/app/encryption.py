@@ -16,6 +16,7 @@ def initEncryption(connStr, dbName, colName):
     # the encryption data keys.
     key_vault_db_name = dbName
     key_vault_coll_name = "__keyvault"
+    key_vault_namespace = key_vault_db_name+"."+key_vault_coll_name
 
     doc_count = client[key_vault_db_name][key_vault_coll_name].count_documents({})
 
