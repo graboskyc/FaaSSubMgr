@@ -40,19 +40,18 @@ function init() {
 
         async generatePipeline() {
             console.log('Generating Pipeline');
-            console.log(this.selectedPipelineOptions);
+            //console.log(this.selectedPipelineOptions);
             if(this.selectedPipelineOptions.length == 1) {
                 this.selectedStream.pipeline = JSON.stringify([
-                    [{'$match': {'operationType': this.selectedPipelineOptions[0]}}]
+                    {'$match': {'operationType': this.selectedPipelineOptions[0]}}
                 ]);
             } else if(this.selectedPipelineOptions.length > 0) {
                 this.selectedStream.pipeline = JSON.stringify([
-                    [{'$match': {'operationType': {'$in':this.selectedPipelineOptions }}}]
+                    {'$match': {'operationType': {'$in':this.selectedPipelineOptions }}}
                 ]);
             } else {
                 this.selectedStream.pipeline = "[]";
             }
-            this.selectedStream.pipeline.replace('"',"'");
             this.checkboxes = false;
             this.selectedPipelineOptions = [];
         },
