@@ -113,6 +113,7 @@ async def save(id:str, si: SubscriptionItem):
     }
 
     retDoc["fullDocument"] = sampleDoc
+    retDoc["secretsMetadata"] = [{"HereIsOneSampleKey":"HereIsOneSampleValue"}]
 
     response = requests.post(d["webhook"], json=json.loads(dumps(retDoc)))
     return response.text
