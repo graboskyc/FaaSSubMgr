@@ -132,6 +132,20 @@ function init() {
             })).text();
         },
 
+        async restart() {
+            console.log('Restarting all');                        
+            if (confirm("Please confirm you want to restart all triggers") == true) {
+                await fetch('/api/restart', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                await this.loadList();
+                this.editable = false;
+            }
+        },
+
         async togglePassword() {
             this.showPassword = !this.showPassword;
         }

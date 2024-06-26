@@ -117,3 +117,8 @@ async def save(id:str, si: SubscriptionItem):
 
     response = requests.post(d["webhook"], json=json.loads(dumps(retDoc)))
     return response.text
+
+@api_app.put("/restart")
+async def restart():
+    datetime_now = datetime.utcnow()
+    col.update_many({}, {"$set": {"poked":datetime_now} })
