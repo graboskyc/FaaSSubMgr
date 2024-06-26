@@ -2,6 +2,8 @@
 
 ## What is this
 
+Functions as a Service Subscription Manager, obviously
+
 A bare-bones non-scalable implementation of MongoDB [ChangeStreams](https://www.mongodb.com/docs/manual/changeStreams/) integration with [Budibase](https://budibase.com/product/#automate) Automation webhook workflows, which essentially gives a trigger management system. Although the examples use Budibase, it will work with any webhook that accepts an arbitrary HTTP POST.
 
 ## Technology Used
