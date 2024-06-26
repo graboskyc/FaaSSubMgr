@@ -52,6 +52,7 @@ function init() {
             } else {
                 this.selectedStream.pipeline = "[]";
             }
+            this.selectedStream.pipeline.replace('"',"'");
             this.checkboxes = false;
             this.selectedPipelineOptions = [];
         },
