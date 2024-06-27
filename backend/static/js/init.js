@@ -85,6 +85,7 @@ function init() {
                 delete this.selectedStream.modified;
                 delete this.selectedStream.resumeToken;
                 delete this.selectedStream.webhookResponse;
+                delete this.selectedStream.wasError;
                 console.log(this.selectedStream);
                 await fetch('/api/save/'+_id, {
                     method: 'PUT',
@@ -130,6 +131,21 @@ function init() {
                 },
                 body: JSON.stringify(this.selectedStream)
             })).text();
+        },
+
+        async restartOne() {
+            console.log('Loading List');
+            if (confirm("Please confirm restarting '"+this.selectedStream.name+"'") == true) {
+                var _id = this.selectedStream._id.$oid;
+                await fetch('/api/restart/'+_id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                await this.loadList();
+                this.editable = false;
+            }
         },
 
         async restart() {

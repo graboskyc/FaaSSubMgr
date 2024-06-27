@@ -56,7 +56,10 @@
                                 <tr>
                                     <td x-text="s.name"></td>
                                     <td x-text="s.db+'.'+s.col"></td>
-                                    <td><input x-model="s.enabled" type="checkbox" role="switch" disabled /></td>
+                                    <td>
+                                        <input x-model="s.enabled" type="checkbox" role="switch" disabled />
+                                        <span class="material-symbols-outlined" x-show="s.wasError">warning</span>
+                                    </td>
                                     <td>
                                         <button x-on:click="editStream(s)">
                                             <span class="material-symbols-outlined">edit</span>
@@ -184,6 +187,7 @@
                         <button x-on:click="saveStream">Save</button>
                         <button x-on:click="testWebhook" class="outline">Test Webhook</button>
                         <button x-on:click="loadList" class="secondary">Close</button>
+                        <button x-on:click="restartOne" class="btn-delete">Restart</button>
                         <button x-on:click="deleteStream" class="btn-delete">Delete</button>
                     </article>
                 </dialog>

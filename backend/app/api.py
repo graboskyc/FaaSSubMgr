@@ -15,6 +15,7 @@ import requests
 from app.encryption import initEncryption
 from app.encryption import manualEncrypt
 from app.encryption import manualDecrypt
+from typing import Optional
 
 initEncryption(os.environ["SPECUIMDBCONNSTR"].strip(), "faas", "whathappens")
 
@@ -118,7 +119,12 @@ async def save(id:str, si: SubscriptionItem):
     response = requests.post(d["webhook"], json=json.loads(dumps(retDoc)))
     return response.text
 
+
+@api_app.put("/restart/{id}")
 @api_app.put("/restart")
-async def restart():
+async def restart(id: Optional[str] = None):
     datetime_now = datetime.utcnow()
-    col.update_many({}, {"$set": {"poked":datetime_now} })
+    if id:
+        col.update_one({"_id": ObjectId(id) }, {"$set": {"poked":datetime_now} })
+    else:
+        col.update_many({}, {"$set": {"poked":datetime_now} })

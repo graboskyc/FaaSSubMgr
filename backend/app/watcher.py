@@ -72,10 +72,10 @@ def runWatch(id, conStr, db, col, pipeline, rt, wh, secrets=None):
                     change["secretsMetadata"] = secrets
                     response = requests.post(wh, json=json.loads(dumps(change)))
                     responseToInsert = parseRespose(response)
-                    masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token, "webhookResponse": responseToInsert, "lastRan": datetime.utcnow() }})
+                    masterHandle.update_one({"_id":id}, {"$set": {"resumeToken": resume_token, "webhookResponse": responseToInsert, "lastRan": datetime.utcnow(), "wasError":False }})
                     #print("resume token updated")
                 except:
-                    masterHandle.update_one({"_id":id}, {"$set": {"webhookResponse": "There was an error", "lastRan": datetime.utcnow() }})
+                    masterHandle.update_one({"_id":id}, {"$set": {"webhookResponse": "There was an error", "lastRan": datetime.utcnow(), "wasError":True }})
     except pymongo.errors.PyMongoError as e:
         print("Error in watcher")
         print(e)
