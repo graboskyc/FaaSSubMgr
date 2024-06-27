@@ -9,6 +9,8 @@ function init() {
         webhookResponse : "",
         newSecret: {"key":"", "value":""},
         showPassword: false,
+        firstRun:true,
+        autoRefresh:true,
 
         async loadList() {
             console.log('Loading List');
@@ -16,6 +18,23 @@ function init() {
             console.log(this.listOfStreams);
             this.editable = false;
             this.logs = false;
+
+            if(this.firstRun){
+                this.firstRun = false;
+                this.loop();
+            }
+        },
+
+        delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        },
+          
+        async loop() {
+            while(this.autoRefresh){
+                console.log("Refreshing List");
+                this.listOfStreams= await (await fetch('/api/listAll')).json();
+                await this.delay(10000);
+            }         
         },
 
         async loadLogs(stream) {

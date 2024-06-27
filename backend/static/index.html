@@ -27,6 +27,8 @@
                     <li><img height="32" src="/img/leaf.png" style="height: 32px !important;" /></li>
                 </ul>
                 <ul>
+                    <li x-show="autoRefresh"><button x-on:click="autoRefresh = false" class="secondary outline">Disable Refresh</button></li>
+                    <li x-show="!autoRefresh"><button x-on:click="autoRefresh = true; loop()" class="outline">Enable Refresh</button></li>
                     <li><button x-on:click="restart" class="btn-delete">Restart All</button></li>
                     <li><button x-on:click="newStream">New Stream</button></li>
                 </ul>
