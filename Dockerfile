@@ -7,5 +7,5 @@ RUN rm -rf ./venv activate.sh sample.env
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./backend .
-EXPOSE 8000
+EXPOSE 80
 CMD [ "python", "./main.py" ]

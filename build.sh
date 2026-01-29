@@ -28,7 +28,7 @@ if [ $EXITCODE -eq 0 ]
     echo
     docker stop faassubmgr
     docker rm faassubmgr
-    docker run -t -i -d -p 8000:8000 --name faassubmgr -e "SPECUIMDBCONNSTR=${SPECUIMDBCONNSTR}" -e "MASTERENCKEYASBASE64=${MASTERENCKEYASBASE64}" --restart unless-stopped graboskyc/faassubmgr:${abbrvhash}
+    docker run -t -i -d -p 8000:80 --name faassubmgr -e "SPECUIMDBCONNSTR=${SPECUIMDBCONNSTR}" -e "MASTERENCKEYASBASE64=${MASTERENCKEYASBASE64}" --restart unless-stopped graboskyc/faassubmgr:${abbrvhash}
 
     echo
     echo "+================================"
